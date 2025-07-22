@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transmissão ao Vivo</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%;
+      background-color: black;
+    }
+    .video-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .video-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    iframe {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .mask {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.0);
+      pointer-events: none;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <div class="video-wrapper">
+      <div class="mask"></div>
+      <iframe id="liveFrame"
+        src="https://www.youtube.com/embed/MyGyZAA-FA8?autoplay=1&mute=1"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <script>
+    const iframe = document.getElementById("liveFrame");
+
+    const fallbackSources = [
+      "https://www.youtube.com/embed/live_stream?channel=UCQo5U0DYoX9wXhMjMG43D_g&autoplay=1&mute=1", // canalcuritiba360
+      "https://www.youtube.com/embed/live_stream?channel=UCbkyy-OJcUQRsz2xX4Ygr4w&autoplay=1&mute=1"  // PlaneSpotterhdCuritiba
+    ];
+
+    let currentIndex = 0;
+
+    function tryNextStream() {
+      currentIndex++;
+      if (currentIndex < fallbackSources.length) {
+        iframe.src = fallbackSources[currentIndex];
+      }
+    }
+
+    // Verifica erro no player
+    iframe.onerror = tryNextStream;
+
+    // Verifica a cada 1h se a live ainda está carregando
+    setInterval(() => {
+      const iframeSrc = iframe.src;
+      iframe.src = iframeSrc; // força reload
+    }, 60 * 60 * 1000); // 1h
+
+  </script>
+</body>
+</html>
