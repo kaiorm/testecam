@@ -9,9 +9,7 @@
       margin: 0; padding: 0;
       height: 100%;
       background-color: black;
-      font-family: Arial, sans-serif;
     }
-
     .video-container {
       width: 100vw;
       height: 100vh;
@@ -20,29 +18,17 @@
       align-items: center;
       position: relative;
     }
-
     .video-wrapper {
       width: 100%;
       height: 100%;
       position: relative;
     }
-
     iframe {
       position: absolute;
       width: 100%;
       height: 100%;
       border: none;
     }
-
-    .mask {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.0);
-      pointer-events: none;
-      z-index: 2;
-    }
-
     #fallback-message {
       position: absolute;
       color: white;
@@ -59,44 +45,28 @@
 <body>
   <div class="video-container">
     <div class="video-wrapper">
-      <div class="mask"></div>
       <div id="fallback-message">Nenhuma transmissão ao vivo no momento.</div>
-      <iframe id="liveFrame"
-        allow="autoplay; encrypted-media"
-        allowfullscreen>
-      </iframe>
+      <iframe id="liveFrame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
   </div>
 
   <script>
-    async function loadLive() {
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxeTX15pL6cZe9UmOfyUNFDmP4oFcGoIOV6De3Rrq82VKXduuM-PDrXdYoBEHuLZkwT/exec");
-        const url = await response.text();
+    function liveCallback(url) {
+      const iframe = document.getElementById("liveFrame");
+      const msg = document.getElementById("fallback-message");
 
-        const iframe = document.getElementById("liveFrame");
-        const message = document.getElementById("fallback-message");
-
-        if (url === "none") {
-          message.style.display = "block";
-          iframe.style.display = "none";
-        } else {
-          iframe.src = iframe.src = "https://www.youtube.com/embed/hNPgwhZLPI4?autoplay=1&mute=1";
-          iframe.style.display = "block";
-          message.style.display = "none";
-        }
-      } catch (error) {
-        console.error("Erro ao carregar live:", error);
-        document.getElementById("fallback-message").textContent = "Erro ao carregar a transmissão.";
-        document.getElementById("fallback-message").style.display = "block";
+      if (url === "none") {
+        msg.style.display = "block";
+        iframe.style.display = "none";
+      } else {
+        iframe.src = url;
+        msg.style.display = "none";
+        iframe.style.display = "block";
       }
     }
-
-    // Carrega inicialmente
-    loadLive();
-
-    // Recarrega a cada 1h
-    setInterval(loadLive, 60 * 60 * 1000);
   </script>
+
+  <!-- ✅ Aqui chamamos o Apps Script como um script JS -->
+  <script src="https://script.google.com/macros/s/AKfycbxeTX15pL6cZe9UmOfyUNFDmP4oFcGoIOV6De3Rrq82VKXduuM-PDrXdYoBEHuLZkwT/exec?callback=liveCallback"></script>
 </body>
 </html>
