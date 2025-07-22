@@ -50,36 +50,27 @@
   </div>
 
   <script>
-    const iframe = document.getElementById("liveFrame");
+    async function loadLive() {
+      try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbx5qt9lbgUAbgynBGzO8td3KtNqkccyKtuWyDQJUkBDv7EvIEfBFXBoLgCNpLYxvNNH/exec");
+        const url = await response.text();
 
-    // Lista de canais em ordem de prioridade
-    const streamSources = [
-      "https://www.youtube.com/embed/live_stream?channel=UCQo5U0DYoX9wXhMjMG43D_g&autoplay=1&mute=1", // canalcuritiba360
-      "https://www.youtube.com/embed/live_stream?channel=UCbkyy-OJcUQRsz2xX4Ygr4w&autoplay=1&mute=1"  // PlaneSpotterhdCuritiba
-    ];
-
-    let currentIndex = 0;
-
-    // Tenta carregar a próxima live da lista
-    function loadNextStream() {
-      if (currentIndex < streamSources.length) {
-        iframe.src = streamSources[currentIndex];
-        currentIndex++;
+        const iframe = document.getElementById("liveFrame");
+        if (url === "none") {
+          // fallback (opcional)
+          iframe.src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1";
+        } else {
+          iframe.src = url;
+        }
+      } catch (error) {
+        console.error("Erro ao carregar live:", error);
       }
     }
 
-    // Tenta carregar a próxima live se a atual falhar
-    iframe.onerror = function() {
-      loadNextStream();
-    };
-
-    // Recarrega o player a cada 1h para garantir atualização
-    setInterval(() => {
-      iframe.src = iframe.src;
-    }, 60 * 60 * 1000); // 1 hora
-
-    // Início imediato
-    loadNextStream();
+    // Carrega inicialmente
+    loadLive();
+    // Recarrega a cada 1h
+    setInterval(loadLive, 60 * 60 * 1000);
   </script>
 </body>
 </html>
