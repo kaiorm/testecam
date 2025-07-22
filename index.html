@@ -43,7 +43,6 @@
     <div class="video-wrapper">
       <div class="mask"></div>
       <iframe id="liveFrame"
-        src="https://www.youtube.com/embed/MyGyZAA-FA8?autoplay=1&mute=1"
         allow="autoplay; encrypted-media"
         allowfullscreen>
       </iframe>
@@ -53,29 +52,34 @@
   <script>
     const iframe = document.getElementById("liveFrame");
 
-    const fallbackSources = [
+    // Lista de canais em ordem de prioridade
+    const streamSources = [
       "https://www.youtube.com/embed/live_stream?channel=UCQo5U0DYoX9wXhMjMG43D_g&autoplay=1&mute=1", // canalcuritiba360
       "https://www.youtube.com/embed/live_stream?channel=UCbkyy-OJcUQRsz2xX4Ygr4w&autoplay=1&mute=1"  // PlaneSpotterhdCuritiba
     ];
 
     let currentIndex = 0;
 
-    function tryNextStream() {
-      currentIndex++;
-      if (currentIndex < fallbackSources.length) {
-        iframe.src = fallbackSources[currentIndex];
+    // Tenta carregar a próxima live da lista
+    function loadNextStream() {
+      if (currentIndex < streamSources.length) {
+        iframe.src = streamSources[currentIndex];
+        currentIndex++;
       }
     }
 
-    // Verifica erro no player
-    iframe.onerror = tryNextStream;
+    // Tenta carregar a próxima live se a atual falhar
+    iframe.onerror = function() {
+      loadNextStream();
+    };
 
-    // Verifica a cada 1h se a live ainda está carregando
+    // Recarrega o player a cada 1h para garantir atualização
     setInterval(() => {
-      const iframeSrc = iframe.src;
-      iframe.src = iframeSrc; // força reload
-    }, 60 * 60 * 1000); // 1h
+      iframe.src = iframe.src;
+    }, 60 * 60 * 1000); // 1 hora
 
+    // Início imediato
+    loadNextStream();
   </script>
 </body>
 </html>
