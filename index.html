@@ -51,35 +51,39 @@
   </div>
 
   <script>
-    function liveCallback(url) {
-      const iframe = document.getElementById("liveFrame");
-      const msg = document.getElementById("fallback-message");
+    const sources = [
+      "https://www.youtube.com/embed/live_stream?channel=UCQo5U0DYoX9wXhMjMG43D_g&autoplay=1&mute=1", // canalcuritiba360
+      "https://www.youtube.com/embed/live_stream?channel=UCbkyy-OJcUQRsz2xX4Ygr4w&autoplay=1&mute=1"  // PlaneSpotterhdCuritiba
+    ];
 
-      if (url === "none") {
-        msg.style.display = "block";
-        iframe.style.display = "none";
+    const iframe = document.getElementById("liveFrame");
+    const message = document.getElementById("fallback-message");
+    let currentIndex = 0;
+
+    function tryNextStream() {
+      if (currentIndex < sources.length) {
+        iframe.src = sources[currentIndex] + "&t=" + Date.now(); // evita cache
+        currentIndex++;
       } else {
-        iframe.src = url;
-        msg.style.display = "none";
-        iframe.style.display = "block";
+        message.style.display = "block";
+        iframe.style.display = "none";
       }
     }
 
-    function loadScript() {
-      const oldScript = document.getElementById("liveScript");
-      if (oldScript) oldScript.remove();
+    iframe.onerror = tryNextStream;
 
-      const script = document.createElement("script");
-      script.src = "https://script.google.com/macros/s/AKfycbxeTX15pL6cZe9UmOfyUNFDmP4oFcGoIOV6De3Rrq82VKXduuM-PDrXdYoBEHuLZkwT/exec?callback=liveCallback&t=" + Date.now();
-      script.id = "liveScript";
-      document.body.appendChild(script);
+    function reloadStream() {
+      currentIndex = 0;
+      message.style.display = "none";
+      iframe.style.display = "block";
+      tryNextStream();
     }
 
-    // Carrega inicialmente
-    loadScript();
+    // Inicial
+    reloadStream();
 
-    // Recarrega a cada 1h (3600000 ms)
-    setInterval(loadScript, 30 * 1000); // 30 segundos para teste
+    // Recarrega a cada 1 hora
+    setInterval(reloadStream, 60 * 60 * 1000);
   </script>
 </body>
 </html>
